@@ -21,6 +21,8 @@ This reference implementation is developed using the Intel® Distributon of Open
 * Ubuntu* 16.04 LTS
 * Intel® Distributon of OpenVINO™ toolkit 2018 (R3)
 * Intel® Media SDK
+* Grafana* v5.3.2
+* InfluxDB* v1.6.2
 
 ## Setup
 
@@ -267,7 +269,7 @@ To add the new ads in JSON file, follow this series of instructions:
 
         ![Grafana](./images/Grafana5.png)
     
-     3. Repeat step 2 to add *Singlestat panel* for *Number of male* to the dashboard, with these mdifications:
+     3. Repeat step 2 to add *Singlestat panel* for *Number of male* to the dashboard, with these modifications:
         * For the panel title, change *Number of people* to *Number of male*.
         * Select **Total male** in the **field (value)** of **Metrics**  Singlestat menu option.
 
