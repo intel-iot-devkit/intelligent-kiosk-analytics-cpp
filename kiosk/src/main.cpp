@@ -22,8 +22,8 @@
 */
 
 #include <fcntl.h>
+
 #include "influxdb.hpp"
-#include "main.hpp"
 
 
 // Macros defining which address in "pCount" variable contains what data
