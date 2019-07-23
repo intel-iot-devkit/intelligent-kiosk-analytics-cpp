@@ -7,6 +7,8 @@
 | Time to Complete:    |  45 min     |
 
 
+# ---This reference implementation is under construction, please check back in a couple of weeks for an update.---
+
 ## Introduction
 
 This reference implementation is developed using the Intel® Distributon of OpenVINO™ toolkit for audience analytics and Intel® Media SDK for the display of 4K advertisements. The application identifies the age and gender of the audience standing in front of digital signage, and based on the identification, it selects a suitable 4K advertisement. Real-time data visualization,  which enables developers to monitor trends over time, occurs on Grafana* This reference implementation aims to improve real-world marketing and advertising.
@@ -77,17 +79,6 @@ source /opt/intel/computer_vision_sdk/bin/setupvars.sh
 export LIBVA_DRIVERS_PATH=/opt/intel/mediasdk/lib64
 export LIBVA_DRIVER_NAME=iHD
 export MFX_HOME=/opt/intel/mediasdk
-```
-
-To use InfluxDB client, clone the repository:
-
-```
-git clone https://github.com/orca-zhang/influxdb-cpp
-```
-Copy influxdb.hpp file from influxDB-cpp directory to kiosk-analytics/kiosk/include directory:
-
-``` 
-cp $PWD/influxdb-cpp/influxdb.hpp <path-to-kiosk-analytics>/kiosk/include 
 ```
 
 ### Build the Code
