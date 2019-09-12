@@ -1,0 +1,72 @@
+{
+  "Age_Group": 1,
+  "Gender": "M",
+  "Ads": [
+    "maleAd.h265",
+    "maleAd.h265",
+    "maleAd.h265"
+  ]
+}
+{
+  "Age_Group": 1,
+  "Gender": "F",
+  "Ads": [
+    "femaleAd.h265",
+    "femaleAd.h265",
+    "femaleAd.h265"
+  ]
+}
+{
+  "Age_Group": 2,
+  "Gender": "M",
+  "Ads": [
+    "maleAd.h265",
+    "maleAd.h265",
+    "maleAd.h265"
+  ]
+}
+{
+  "Age_Group": 2,
+  "Gender": "F",
+  "Ads": [
+    "femaleAd.h265",
+    "femaleAd.h265",
+    "femaleAd.h265"
+  ]
+}
+{
+  "Age_Group": 3,
+  "Gender": "M",
+  "Ads": [
+    "maleAd.h265",
+    "maleAd.h265",
+    "maleAd.h265"
+  ]
+}
+{
+  "Age_Group": 3,
+  "Gender": "F",
+  "Ads": [
+    "femaleAd.h265",
+    "femaleAd.h265",
+    "femaleAd.h265"
+  ]
+}
+{
+  "Age_Group": 4,
+  "Gender": "M",
+  "Ads": [
+    "maleAd.h265",
+    "maleAd.h265",
+    "maleAd.h265"
+  ]
+}
+{
+  "Age_Group": 4,
+  "Gender": "F",
+  "Ads": [
+    "femaleAd.h265",
+    "femaleAd.h265",
+    "femaleAd.h265"
+  ]
+}
