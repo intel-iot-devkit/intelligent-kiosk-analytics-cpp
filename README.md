@@ -146,7 +146,7 @@ source /opt/intel/openvino/bin/setupvars.sh
 
 ### Build the Application
 
-To build, go to `intruder-detector-cpp` directory and run the following commands:
+To build, go to `intelligent-kiosk-analytics-cpp` directory and run the following commands:
 
 ```
 mkdir -p build && cd build
