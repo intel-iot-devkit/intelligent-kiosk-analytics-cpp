@@ -557,9 +557,11 @@ int main(int argc, char *argv[])
 
         }
     }
+
     //close windows
     cv::destroyAllWindows();
     // finished with write-side
     close(fd[P1_READ]);
     close(fd[P1_WRITE]);
+
 }

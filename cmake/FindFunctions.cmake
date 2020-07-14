@@ -262,7 +262,7 @@ COMPILE_PDB_NAME ${target})
   
   link_directories(${CMAKE_BINARY_DIR}/intel64/Release/lib)
 
-  target_link_libraries( ${target} format_reader IE::ie_cpu_extension -lcurl ${InferenceEngine_LIBRARIES} gflags)
+  target_link_libraries( ${target} format_reader -lcurl ${InferenceEngine_LIBRARIES} gflags)
   if(UNIX)
     target_link_libraries(  ${target} ${LIB_DL} pthread ${OpenCV_LIBRARIES})
   endif()
@@ -304,7 +304,7 @@ function( make_executable name variant )
   project( ${target} )
 
   add_executable( ${target} ${include} ${sources} )
-  target_link_libraries(${target}  format_reader IE::ie_cpu_extension -lcurl ${InferenceEngine_LIBRARIES} gflags )
+  target_link_libraries(${target}  format_reader -lcurl ${InferenceEngine_LIBRARIES} gflags )
  
   if( defs )
     append_property( ${target} COMPILE_FLAGS ${defs} )

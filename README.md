@@ -1,8 +1,8 @@
-# 4K Advertisement Display on Digital Kiosk Based on Demographics
+﻿# 4K Advertisement Display on Digital Kiosk Based on Demographics
 
 | Details          |                    |
 |-----------------------|---------------|
-| Target OS:            |  Ubuntu* 16.04 LTS|
+| Target OS:            |  Ubuntu* 18.04 LTS|
 | Programming Language: |  C++ |
 | Time to Complete:    |  45 min     |
 
@@ -22,8 +22,8 @@ This reference implementation is developed using the Intel® Distribution of Ope
 * [IEI Tank* AIoT Developer Kit](https://software.intel.com/en-us/iot/hardware/iei-tank-dev-kit)
 
 ### Software
-* Ubuntu* 16.04 LTS
-* Intel® Distribution of OpenVINO™ toolkit 2019 R2 release
+* [Ubuntu\* 18.04 LTS](http://releases.ubuntu.com/18.04/)<br>
+* Intel® Distribution of OpenVINO™ toolkit 2020 R3 release
 * Intel® Media SDK
 
 ## How It Works
@@ -49,7 +49,7 @@ The audience analysis happens even when an ad is playing as the two processes ru
 Clone the reference implementation
 ```
 sudo apt-get update && sudo apt-get install git
-git clone https://github.com/intel-iot-devkit/intelligent-kiosk-analytics-cpp.git
+git clone https://github.com/intel-iot-devkit/intelligent-kiosk-analytics-cpp.git 
 ```
 
 ### Install OpenVINO
@@ -68,7 +68,7 @@ InfluxDB is a time series database designed to handle high write and query loads
 Grafana is an open-source, general purpose dashboard and graph composer, which runs as a web application. It supports Graphite, InfluxDB, Prometheus, OpenTSDB etc., as backends. Grafana allows you to query, visualize, alert on and understand your metrics no matter where they are stored.<br>
 
 ### Which models to use
-This application uses the **[face-detection-retail-0004](https://docs.openvinotoolkit.org/2019_R2/_intel_models_face_detection_retail_0004_description_face_detection_retail_0004.html)**, **[age-gender-recognition-retail-0013](https://docs.openvinotoolkit.org/2019_R2/_intel_models_age_gender_recognition_retail_0013_description_age_gender_recognition_retail_0013.html)** and **[head-pose-estimation-adas-0001](https://docs.openvinotoolkit.org/2019_R2/_intel_models_head_pose_estimation_adas_0001_description_head_pose_estimation_adas_0001.html)** Intel® models, that can be downloaded using the model downloader. The model downloader downloads the .xml and .bin files that will be used by the application.
+This application uses the **[face-detection-retail-0004](https://docs.openvinotoolkit.org/2020.3/_models_intel_face_detection_retail_0004_description_face_detection_retail_0004.html)**, **[age-gender-recognition-retail-0013](https://docs.openvinotoolkit.org/2020.3/_models_intel_age_gender_recognition_retail_0013_description_age_gender_recognition_retail_0013.html)** and **[head-pose-estimation-adas-0001](https://docs.openvinotoolkit.org/2020.3/_models_intel_head_pose_estimation_adas_0001_description_head_pose_estimation_adas_0001.html)** Intel® models, that can be downloaded using the model downloader. The model downloader downloads the .xml and .bin files that will be used by the application.
 
 To download the models and install the dependencies of the application, run the below command in `intelligent-kiosk-analytics-cpp` directory:<br>
 ```
@@ -152,7 +152,6 @@ To build, go to `intelligent-kiosk-analytics-cpp` directory and run the followin
 mkdir -p build && cd build
 cmake ..
 make
-export LD_LIBRARY_PATH=$PWD/ie_cpu_extension:$LD_LIBRARY_PATH
 ```
 
 ## Run the Application
@@ -160,7 +159,7 @@ export LD_LIBRARY_PATH=$PWD/ie_cpu_extension:$LD_LIBRARY_PATH
 Although the application runs on the CPU by default, this can also be explicitly specified through the _-d CPU_ _-d_hp CPU_ _-d_ag CPU_ as command-line argument:
 
 ```
-__bin/Release/application -m /opt/intel/openvino/deployment_tools/open_model_zoo/tools/downloader/Retail/object_detection/face/sqnet1.0modif-ssd/0004/dldt/FP32/face-detection-retail-0004.xml -m_ag /opt/intel/openvino/deployment_tools/open_model_zoo/tools/downloader/Retail/object_attributes/age_gender/dldt/FP32/age-gender-recognition-retail-0013.xml -m_hp /opt/intel/openvino/deployment_tools/open_model_zoo/tools/downloader/Transportation/object_attributes/headpose/vanilla_cnn/dldt/FP32/head-pose-estimation-adas-0001.xml
+ __bin/Release/application -m  /opt/intel/openvino_2020.3.194/deployment_tools/open_model_zoo/tools/downloader/intel/face-detection-retail-0004/FP32/face-detection-retail-0004.xml -m_ag /opt/intel/openvino_2020.3.194/deployment_tools/open_model_zoo/tools/downloader/intel/age-gender-recognition-retail-0013/FP32/age-gender-recognition-retail-0013.xml -m_hp /opt/intel/openvino_2020.3.194/deployment_tools/open_model_zoo/tools/downloader/intel/head-pose-estimation-adas-0001/FP32/head-pose-estimation-adas-0001.xml
 ```
 
 In addition to the model provided by the Intel® Distribution of OpenVINO™ toolkit, the user can include models trained on Caffe*, TensorFlow*, or Apache MXNet* machine learning frameworks for face-detection, age-gender recognition, or head pose. To do this, first configure the model optimizer for the framework used and then convert the trained model to produce an optimized Intermediate Representation (IR) of the model.
@@ -175,7 +174,7 @@ __bin/Release/application -m <path-to-face-detection-IR>/face-detection.xml -m_a
 **Note:**
 1. To exit from the application, click on the **Detection results** window and long press the ESC key. <br>
 2. To run the application on sync mode, use `-async 0` as the command-line argument. By default the application runs on Async mode.
-3. To run with multiple devices use _-d MULTI:device1,device2_. For example: _-d MULTI:CPU,GPU,MYRIAD_
+3. To run with multiple devices use _MULTI:device1,device2_. For example: _-d MULTI:CPU,GPU,MYRIAD_
 
 ### Running on different hardware
 
@@ -188,7 +187,7 @@ The application can use different hardware accelerator for different models. The
 For example:
 To run Face Detection model on CPU and Age Gender Recognition model with FP32 on GPU, Head Pose Estimation model on MYRIAD, use the below command:
 ```
-__bin/Release/application -m /opt/intel/openvino/deployment_tools/open_model_zoo/tools/downloader/Retail/object_detection/face/sqnet1.0modif-ssd/0004/dldt/FP32/face-detection-retail-0004.xml -m_ag /opt/intel/openvino/deployment_tools/open_model_zoo/tools/downloader/Retail/object_attributes/age_gender/dldt/FP32/age-gender-recognition-retail-0013.xml -m_hp /opt/intel/openvino/deployment_tools/open_model_zoo/tools/downloader/Transportation/object_attributes/headpose/vanilla_cnn/dldt/FP16/head-pose-estimation-adas-0001.xml -d CPU -d_ag GPU -d_hp MYRIAD
+__bin/Release/application -m /opt/intel/openvino_2020.3.194/deployment_tools/open_model_zoo/tools/downloader/intel/face-detection-retail-0004/FP32/face-detection-retail-0004.xml -m_ag /opt/intel/openvino_2020.3.194/deployment_tools/open_model_zoo/tools/downloader/intel/age-gender-recognition-retail-0013/FP32/age-gender-recognition-retail-0013.xml -m_hp /opt/intel/openvino_2020.3.194/deployment_tools/open_model_zoo/tools/downloader/intel/head-pose-estimation-adas-0001/FP32/head-pose-estimation-adas-0001.xml -d CPU -d_ag GPU -d_hp MYRIAD
 ```
 
 **FP32**: FP32 is single-precision floating-point arithmetic uses 32 bits to represent numbers. 8 bits for the magnitude and 23 bits for the precision. For more information, [click here](https://en.wikipedia.org/wiki/Single-precision_floating-point_format) <br>
@@ -221,6 +220,7 @@ To run the application on the FPGA , use the `-d HETERO:FPGA,CPU` command-line a
 __bin/Release/kiosk -m /opt/intel/openvino/deployment_tools/open_model_zoo/tools/downloader/Retail/object_detection/face/sqnet1.0modif-ssd/0004/dldt/FP32/face-detection-retail-0004.xml -m_ag /opt/intel/openvino/deployment_tools/open_model_zoo/tools/downloader/Retail/object_attributes/age_gender/dldt/FP32/age-gender-recognition-retail-0013.xml -m_hp /opt/intel/openvino/deployment_tools/open_model_zoo/tools/downloader/Transportation/object_attributes/headpose/vanilla_cnn/dldt/FP32/head-pose-estimation-adas-0001.xml -d HETERO:FPGA,CPU
 ```
 -->
+<!--
 ### Troubleshooting
 
 The application may display an error concerning regarding shared library loading: *__bin/Release/application: error while loading shared libraries: libcpu_extension.so: cannot open shared object file: No such file or directory*.
@@ -230,6 +230,7 @@ If this error occurs, go to *intelligent-kiosk-analytics-cpp* directory and expo
 cd build
 export LD_LIBRARY_PATH=$PWD/ie_cpu_extension:$LD_LIBRARY_PATH
 ```
+-->
 
 ### Add New Advertisements to the List of Ads
 

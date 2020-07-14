@@ -33,7 +33,7 @@
 #include "visualizer.hpp"
 
 #include <ie_iextension.h>
-#include <ext_list.hpp>
+//#include <ext_list.hpp>
 
 
 
@@ -45,13 +45,14 @@ FaceDetection *faceDetector;
 AgeGenderDetection *ageGenderDetector;
 HeadPoseDetection *headPoseDetector;
  
-InferencePlugin plugin;
+//InferencePlugin plugin;
 
 bool ParseAndCheckCommandLine(int argc, char *argv[]) {
     // ---------------------------Parsing and validating input arguments--------------------------------------
     gflags::ParseCommandLineNonHelpFlags(&argc, &argv, true);
     if (FLAGS_h) {
         showUsage();
+        showAvailableDevices();    
         return false;
     }
     slog::info << "Parsing input parameters" << slog::endl;
@@ -108,10 +109,15 @@ int loadModel(int argc, char* argv[])
         
         // ---------------------------------------------------------------------------------------------------
         // --------------------------- 1. Loading plugin to the Inference Engine -----------------------------
-        std::map<std::string, InferencePlugin> pluginsForDevices;
-        std::vector<std::pair<std::string, std::string>> cmdOptions = {
-            {FLAGS_d, FLAGS_m}, {FLAGS_d_ag, FLAGS_m_ag}, {FLAGS_d_hp, FLAGS_m_hp}
+        Core ie;
+
+        std::set<std::string> loadedDevices;
+        std::pair<std::string, std::string> cmdOptions[] = {
+            {FLAGS_d, FLAGS_m},
+            {FLAGS_d_ag, FLAGS_m_ag},
+            {FLAGS_d_hp, FLAGS_m_hp}
         };
+        
         faceDetector = new FaceDetection(FLAGS_m, FLAGS_d, 1, false, FLAGS_async, FLAGS_t, FLAGS_r,
                                    static_cast<float>(FLAGS_bb_enlarge_coef), static_cast<float>(FLAGS_dx_coef),
                                    static_cast<float>(FLAGS_dy_coef));
@@ -128,14 +134,15 @@ int loadModel(int argc, char* argv[])
                 continue;
             }
 
-            if (pluginsForDevices.find(deviceName) != pluginsForDevices.end()) {
+            if (loadedDevices.find(deviceName) != loadedDevices.end()) {
                 continue;
             }
-            slog::info << "Loading plugin " << deviceName << slog::endl;
-            plugin = PluginDispatcher().getPluginByDevice(deviceName);
-
+            slog::info << "Loading device " << deviceName << slog::endl;
+            std::cout << ie.GetVersions(deviceName) << std::endl;
+            
             /** Loading extensions for the CPU plugin **/
-            if ((deviceName.find("CPU") != std::string::npos)) {
+            /*
+	    if ((deviceName.find("CPU") != std::string::npos)) {
                 plugin.AddExtension(std::make_shared<Extensions::Cpu::CpuExtensions>());
 
                 if (!FLAGS_l.empty()) {
@@ -144,26 +151,25 @@ int loadModel(int argc, char* argv[])
                     plugin.AddExtension(extension_ptr);
                     slog::info << "CPU Extension loaded: " << FLAGS_l << slog::endl;
                 }
-            } else if (!FLAGS_c.empty()) {
-                // Loading extensions for other plugins not CPU
-                plugin.SetConfig({{PluginConfigParams::KEY_CONFIG_FILE, FLAGS_c}});
+            }*/
+            if (!FLAGS_c.empty()) {
+                // Loading extensions for GPU
+                 ie.SetConfig({{PluginConfigParams::KEY_CONFIG_FILE, FLAGS_c}}, "GPU");
             }
-            pluginsForDevices[deviceName] = plugin;
+            loadedDevices.insert(deviceName);
         }
 
         /** Per-layer metrics **/
         if (FLAGS_pc) {
-            for (auto && plugin : pluginsForDevices) {
-                plugin.second.SetConfig({{PluginConfigParams::KEY_PERF_COUNT, PluginConfigParams::YES}});
-            }
+            ie.SetConfig({{PluginConfigParams::KEY_PERF_COUNT, PluginConfigParams::YES}});
         }
         // ---------------------------------------------------------------------------------------------------
 
         // --------------------------- 2. Reading IR models and loading them to plugins ----------------------
         // Disable dynamic batching for face detector as it processes one image at a time
-        Load(*faceDetector).into(pluginsForDevices[FLAGS_d], false);
-        Load(*ageGenderDetector).into(pluginsForDevices[FLAGS_d_ag], FLAGS_dyn_ag);
-        Load(*headPoseDetector).into(pluginsForDevices[FLAGS_d_hp], FLAGS_dyn_hp);
+        Load(*faceDetector).into(ie, FLAGS_d, false);
+        Load(*ageGenderDetector).into(ie, FLAGS_d_ag, FLAGS_dyn_ag);
+        Load(*headPoseDetector).into(ie, FLAGS_d_hp, FLAGS_dyn_hp);
         if(FLAGS_async == 0)
             std::cout<<"Application running in sync mode"<<std::endl;
         else
@@ -191,20 +197,19 @@ int analysePeople(cv::Mat frame) {
         static int frameCount = 0, dataCount = 0;
         if(dataCount == 5 && frameCount % 5 == 0)
             dataCount = 0;
-
+        
         if(frameCount % 5 == 0)
         {
             demographics[dataCount] = {0};
         }
 
         cv::namedWindow("Detection results", cv::WINDOW_NORMAL );
-
+        
         const size_t width  = static_cast<size_t>(frame.cols);
         const size_t height = static_cast<size_t>(frame.rows);
 
                 // --------------------------- 3. Doing inference -----------------------------------------------------
         // Starting inference & calculating performance
- 
         bool isFaceAnalyticsEnabled = ageGenderDetector->enabled() || headPoseDetector->enabled();
 
         std::ostringstream out;
@@ -212,16 +217,15 @@ int analysePeople(cv::Mat frame) {
         double msrate = -1;
         static std::list<Face::Ptr> faces;
         size_t id = 0;
-
         Visualizer::Ptr visualizer;
+        
         if (!FLAGS_no_show) {
             visualizer = std::make_shared<Visualizer>(cv::Size(width, height));
         }
-
         // Detecting all faces on the first frame and reading the next one
         faceDetector->enqueue(frame);
         faceDetector->submitRequest();
-
+        
         if(faceDetector->isAsync)
             faceDetector->request.swap(faceDetector->nxtrequest);
         timer.start("total");
@@ -230,7 +234,7 @@ int analysePeople(cv::Mat frame) {
         faceDetector->wait();
         faceDetector->fetchResults();
         auto prev_detection_results = faceDetector->results;
-
+        
         // Filling inputs of face analytics networks
         for (auto &&face : prev_detection_results) {
             if (isFaceAnalyticsEnabled) {
@@ -352,12 +356,12 @@ int analysePeople(cv::Mat frame) {
             demographics[dataCount].peopleCount = prev_detection_results.size();
             dataCount++;
         }
-
+        
         // Showing performance results
         if (FLAGS_pc) {
-            faceDetector->printPerformanceCounts();
-            ageGenderDetector->printPerformanceCounts();
-            headPoseDetector->printPerformanceCounts();
+            //faceDetector->printPerformanceCounts(getFullDeviceName(ie, FLAGS_d));
+            //ageGenderDetector->printPerformanceCounts(getFullDeviceName(ie, FLAGS_d_ag));
+            //headPoseDetector->printPerformanceCounts(getFullDeviceName(ie, FLAGS_d_hp));
         }
         // ---------------------------------------------------------------------------------------------------
         frameCount++;
